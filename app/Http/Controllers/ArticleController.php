@@ -2,23 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ArticleParserService;
 use App\Models\Article;
-use Illuminate\Http\Request;
 
 class ArticleController extends Controller
 {
-    public function index(Request $request)
+    protected $articleParser;
+
+    public function __construct(ArticleParserService $articleParser)
     {
-        $sortField = $request->get('sortField', 'author');
-        $sortDirection = $request->get('sortDirection', 'asc');
+        $this->articleParser = $articleParser;
+    }
 
-        $articles = Article::query()
-            ->orderBy($sortField, $sortDirection)
-            ->get();
+    public function index()
+    {
+        // Загружаем статьи
+        $this->articleParser->fetchArticles();
 
-        return view('index', compact('articles', 'sortField', 'sortDirection'));
+        // Получаем все статьи из базы данных
+        $articles = Article::all();
+
+        // Передаем статьи в представление
+        return view('articles.index', compact('articles'));
     }
 }
-
-
-
