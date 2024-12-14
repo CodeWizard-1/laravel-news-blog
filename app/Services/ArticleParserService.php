@@ -32,9 +32,9 @@ class ArticleParserService
                 'headers' => $headers
             ]);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
-            // Обрабатываем исключение, если не удалось получить данные
-            echo 'Ошибка: ' . $e->getMessage();
-            return;
+            // Логируем ошибку вместо вывода на экран
+            Log::error('Ошибка при запросе данных: ' . $e->getMessage());
+            return; // Останавливаем выполнение, если ошибка
         }
 
         $html = (string) $response->getBody();
@@ -45,11 +45,18 @@ class ArticleParserService
         // Парсим статьи
         $articles = $crawler->filter('.group')->each(function (Crawler $node) {
             $title = $node->filter('h3')->text('Untitled'); // Получаем заголовок
-            $author = 'Unknown'; // Автор по умолчанию
-            $tags = []; // Теги по умолчанию, нужно будет обновить, если теги будут на странице
+            $authorNode = $node->filter('a[rel="author"]');
+            $author = $authorNode->count() ? $authorNode->text() : 'Unknown';           
+            $tags = $node->filter('.flex .inline-flex')->each(function (Crawler $tagNode) {
+                return $tagNode->text();
+            }); // Теги по умолчанию, нужно будет обновить, если теги будут на странице
             $link = $node->filter('a')->attr('href'); // Ссылка на статью
-            $publication_date = now()->format('Y-m-d'); // Текущая дата (можно заменить, если дата есть на странице)
-
+            $publication_date = $node->filter('time')->first();
+            if ($publication_date->count()) {
+                $publication_date = $publication_date->attr('datetime');
+            } else {
+                $publication_date = now()->format('Y-m-d'); // Если нет, используем текущую дату
+            }
             // Проверяем, если ссылка относительная, добавляем домен
             if (strpos($link, '/') === 0) {
                 $link = 'https://laravel-news.com' . $link;
@@ -88,3 +95,4 @@ class ArticleParserService
         }
     }
 }
+
