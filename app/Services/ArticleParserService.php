@@ -19,7 +19,7 @@ class ArticleParserService
     public function fetchArticles()
     {
         // URL для получения статей с тегом 'news'
-        $url = 'https://laravel-news.com/blog?tag=news';
+        $url = 'https://laravel-news.com/blog';
 
         // Устанавливаем заголовки для имитации запроса от браузера
         $headers = [
@@ -80,6 +80,30 @@ class ArticleParserService
         $articles = array_filter($articles);
         $articles = array_values($articles); // Пересчитываем индексы массива
 
+        // Фильтруем статьи по тегам (оставляем только те, у которых тег "News")
+        $articles = array_filter($articles, function ($article) {
+            // Приводим все теги к нижнему регистру и проверяем наличие тега 'news'
+            return in_array('news', array_map('strtolower', $article['tags']));
+        });
+
+        // Фильтруем статьи по дате: оставляем только те, что были опубликованы за последние 4 месяца
+        $fourMonthsAgo = Carbon::now()->subMonths(4);
+
+        $articles = array_filter($articles, function ($article) use ($fourMonthsAgo) {
+            // Преобразуем дату публикации в объект Carbon, проверяя возможный формат
+            try {
+                // Попробуем сначала использовать формат 'Y-m-d\TH:i:s' (например: 2024-12-13T10:00:00)
+                $publicationDate = Carbon::parse($article['publication_date']);
+            } catch (\Exception $e) {
+                // Если ошибка парсинга, попробуем другое преобразование, например, 'Y-m-d'
+                $publicationDate = Carbon::createFromFormat('Y-m-d', $article['publication_date']);
+            }
+
+            // Проверяем, что дата статьи больше или равна дате 4 месяца назад
+            return $publicationDate->greaterThanOrEqualTo($fourMonthsAgo);
+        });
+
+
         // Теперь для каждой статьи извлекаем дополнительные данные с её страницы
         foreach ($articles as &$articleData) {
             try {
@@ -114,9 +138,6 @@ class ArticleParserService
                 Log::error("Ошибка при парсинге статьи {$articleData['link']}: " . $e->getMessage());
             }
         }
-
-
-
 
 
         // Сохраняем данные в базе
