@@ -80,6 +80,45 @@ class ArticleParserService
         $articles = array_filter($articles);
         $articles = array_values($articles); // Пересчитываем индексы массива
 
+        // Теперь для каждой статьи извлекаем дополнительные данные с её страницы
+        foreach ($articles as &$articleData) {
+            try {
+                $response = $this->client->get($articleData['link'], [
+                    'headers' => $headers
+                ]);
+                $html = (string) $response->getBody();
+                $articleCrawler = new Crawler($html);
+
+                // Извлекаем дату, автора и дополнительные теги
+                $publicationDateNode = $articleCrawler->filter('time'); // Убедитесь, что селектор правильный
+                $publicationDate = $publicationDateNode->count()
+                    ? $publicationDateNode->attr('datetime')
+                    : now()->format('Y-m-d');
+
+                // Извлекаем только теги из ссылок с конкретным href (начинаются на "/tag" или "/category")
+                $tags = $articleCrawler->filter('div.flex.flex-wrap.items-center a')->reduce(function (Crawler $node) {
+                    $href = $node->attr('href');
+                    // Проверяем, что ссылка содержит нужные маркеры (tag или category)
+                    return str_starts_with($href, '/tag') || str_starts_with($href, '/category');
+                })->each(function (Crawler $tagNode) {
+                    return trim($tagNode->text());
+                });
+                // Извлекаем имя автора
+                $authorNode = $articleCrawler->filter('a[rel="author"]');
+                $author = $authorNode->count() ? trim($authorNode->text()) : 'Unknown';
+
+                $articleData['publication_date'] = $publicationDate;
+                $articleData['tags'] = array_unique(array_merge($articleData['tags'], $tags));
+                $articleData['author'] = $author; // Добавляем автора
+            } catch (\Exception $e) {
+                Log::error("Ошибка при парсинге статьи {$articleData['link']}: " . $e->getMessage());
+            }
+        }
+
+
+
+
+
         // Сохраняем данные в базе
         foreach ($articles as $articleData) {
             // Обновляем или создаем статью в базе данных

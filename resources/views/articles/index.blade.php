@@ -23,6 +23,7 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #F5F6F9;
+            /* background-image: url("{{ asset('storage/images/background-image-with-a-light-gray-color.jpg') }}"); */
         }
         table {
             width: 100%;
@@ -49,9 +50,9 @@
         }
 
         .bg-image {
-            background-image: url("{{ asset('storage/images/bg-hero3.jpg') }}");
+            background-image: url("{{ asset('storage/images/background-hero-image-with-a-light-gray.jpg') }}");
             background-size: cover; /* Покрывает весь блок */
-            background-position: center; /* Центрирует изображение */
+            background-position: bottom; /* Центрирует изображение */
             background-repeat: no-repeat; /* Отключает повтор */
             color: white; /* Делает текст белым для контраста */
         }
@@ -62,32 +63,32 @@
         <div class="row py-lg-5">
             <div class="col-lg-6 col-md-8 mx-auto">
                 <h1 class="fw-light">Laravel News Blog</h1>
-                <p class="lead text-body-secondary text-white">All the latest Laravel News posts</p>
+                <p class="lead  text-white">All the latest Laravel News posts</p>
             </div>
         </div>
     </section>
-    <section class="py-5 text-center container">
+    <section class="py-5  container">
     <table class="table">
     <thead>
-        <tr>
-        <th scope="col">
+        <tr class="table-light">
+        <th scope="col" class="text-center">
             <a href="?sort_by=publication_date&order={{ request('order') === 'asc' ? 'desc' : 'asc' }}">
             <i class="fa-regular fa-calendar-days"></i>
             Publication Date
                 {{ request('sort_by') === 'publication_date' ? (request('order') === 'asc' ? '⬆️' : '⬇️') : '' }}
             </a>
         </th>
-        <th scope="col">
+        <th scope="col" class="text-center">
             <a href="?sort_by=title&order={{ request('order') === 'asc' ? 'desc' : 'asc' }}">
             <i class="fa-brands fa-blogger"></i>
                 Title
                 {{ request('sort_by') === 'title' ? (request('order') === 'asc' ? '⬆️' : '⬇️') : '' }}
             </a>
         </th>
-        <th scope="col">
+        <th scope="col" class="text-center">
             <i class="fa-solid fa-at"></i>    
             Author</th>
-        <th scope="col">
+        <th scope="col" class="text-center">
             <i class="fa-solid fa-tags"></i>    
             Tags</th>
         </tr>
@@ -95,10 +96,10 @@
     <tbody>
         @foreach ($articles as $article)
             <tr>
-                <td>{{ \Carbon\Carbon::parse($article->publication_date)->format('d.m.Y') }}</td>
+                <td class="text-center">{{ \Carbon\Carbon::parse($article->publication_date)->format('d.m.Y') }}</td>
                 <td><a href="{{ $article->link }}" target="_blank">{{ $article->title }}</a></td>
-                <td>{{ $article->author }}</td>
-                <td>{{ $article->tags }}</td>
+                <td class="text-center">{{ $article->author }}</td>
+                <td class="text-center">{{ $article->tags }}</td>
             </tr>
         @endforeach
     </tbody>
@@ -106,12 +107,12 @@
 
     <button id="fetch-updates" type="button" class="btn btn-primary">Update articles</button>
     </section>
-    <footer class="text-body-secondary py-5 bg-white">
+    <footer class=" py-5 bg-black">
         <div class="container">
             <p class="float-end mb-1">
             <a href="#">Back to top</a>
             </p>
-            <p class="mb-1">The project was completed as a test task!</p>
+            <p class="mb-1 text-white">The project was completed as a test task!</p>
         </div>
     </footer>
     <!-- Модальное окно -->
