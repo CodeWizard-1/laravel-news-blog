@@ -16,17 +16,17 @@ class ArticleController extends Controller
         $this->articleParser = $articleParser;
     }
 
-    public function index()
-    {
-        // Загружаем статьи
-        $this->articleParser->fetchArticles();
+    // public function index()
+    // {
+    //     // Загружаем статьи
+    //     $this->articleParser->fetchArticles();
 
-        // Получаем все статьи из базы данных
-        $articles = Article::all();
+    //     // Получаем все статьи из базы данных
+    //     $articles = Article::all();
 
-        // Передаем статьи в представление
-        return view('articles.index', compact('articles'));
-    }
+    //     // Передаем статьи в представление
+    //     return view('articles.index', compact('articles'));
+    // }
 
     public function fetchUpdates(Request $request)
     {
@@ -49,6 +49,18 @@ class ArticleController extends Controller
             'articles' => $articles
         ]);
     }
+    public function index(Request $request)
+    {
+        $this->articleParser->fetchArticles(); // Загрузка статей через сервис
+
+        $sortBy = $request->get('sort_by', 'publication_date'); // Значение по умолчанию
+        $order = $request->get('order', 'asc');
+
+        $articles = Article::orderBy($sortBy, $order)->get();
+
+        return view('articles.index', compact('articles', 'sortBy', 'order'));
+    }
+
 }
 
 

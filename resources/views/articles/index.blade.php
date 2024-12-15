@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Articles</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
     <!-- Подключение стилей для таблицы -->
     <style>
         body {
@@ -38,7 +40,7 @@
 <body>
     <h1>Articles</h1>
 
-    <table>
+    <!-- <table>
         <thead>
             <tr>
                 <th>
@@ -67,9 +69,41 @@
                 </tr>
             @endforeach
         </tbody>
-    </table>
-    <button id="fetch-updates" style="margin-top: 20px;">Fetch Updates from Source</button>
+    </table> -->
 
+    <table class="table">
+    <thead>
+        <tr>
+        <th scope="col">
+            <a href="?sort_by=publication_date&order={{ request('order') === 'asc' ? 'desc' : 'asc' }}">
+                Publication Date
+                {{ request('sort_by') === 'publication_date' ? (request('order') === 'asc' ? '⬆️' : '⬇️') : '' }}
+            </a>
+        </th>
+        <th scope="col">
+            <a href="?sort_by=title&order={{ request('order') === 'asc' ? 'desc' : 'asc' }}">
+                Title
+                {{ request('sort_by') === 'title' ? (request('order') === 'asc' ? '⬆️' : '⬇️') : '' }}
+            </a>
+        </th>
+        <th scope="col">Author</th>
+        <th scope="col">Tags</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($articles as $article)
+            <tr>
+                <td>{{ \Carbon\Carbon::parse($article->publication_date)->format('d.m.Y') }}</td>
+                <td><a href="{{ $article->link }}" target="_blank">{{ $article->title }}</a></td>
+                <td>{{ $article->author }}</td>
+                <td>{{ $article->tags }}</td>
+            </tr>
+        @endforeach
+    </tbody>
+    </table>
+
+    <!-- <button id="fetch-updates" style="margin-top: 20px;">Fetch Updates from Source</button> -->
+    <button id="fetch-updates" type="button" class="btn btn-primary">Update</button>
     <script>
         document.getElementById('fetch-updates').addEventListener('click', function() {
             fetch('/fetch-updates', {
@@ -120,5 +154,7 @@
         }
 
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
 </body>
 </html>
