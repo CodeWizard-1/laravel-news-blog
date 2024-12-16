@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "guzzlehttp/guzzle": "^7.9",
+        "guzzlehttp/promises": "^2.0",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
         "symfony/css-selector": "^7.2",

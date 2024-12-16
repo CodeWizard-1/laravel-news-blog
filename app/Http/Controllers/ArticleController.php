@@ -77,7 +77,7 @@ class ArticleController extends Controller
     {
         $this->articleParser->fetchArticles(); // Загрузка статей через сервис
 
-        $sortBy = $request->get('sort_by', 'publication_date'); // Значение по умолчанию
+        $sortBy = $request->get('sort_by', 'author'); // По умолчанию сортировать по автору
         $order = $request->get('order', 'asc');
 
         $fourMonthsAgo = Carbon::now()->subMonths(4);  // Дата 4 месяца назад
@@ -92,5 +92,4 @@ class ArticleController extends Controller
     }
 
 }
-
 
