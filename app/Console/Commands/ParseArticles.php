@@ -33,7 +33,7 @@ class ParseArticles extends Command
                     'Accept-Language' => 'en-US,en;q=0.9',
                 ],
             ]);
-            $this->info('Request was successful.');  // Добавьте это сообщение
+            $this->info('Request was successful.');  
         } catch (\Exception $e) {
             $this->error('Error fetching articles: ' . $e->getMessage());
             return;
@@ -44,17 +44,15 @@ class ParseArticles extends Command
 
         $articles = $crawler->filter('.group')->each(function (Crawler $node) {
             $title = $node->filter('h3')->text('Untitled');
-            $author = 'Unknown'; // Автор по умолчанию
-            $tags = []; // Теги по умолчанию
+            $author = 'Unknown'; 
+            $tags = []; 
             $link = $node->filter('a')->attr('href');
-            $publication_date = now()->format('Y-m-d'); // Текущая дата
+            $publication_date = now()->format('Y-m-d'); 
         
-            // Проверяем, если ссылка относительная, добавляем домен
             if (strpos($link, '/') === 0) {
                 $link = 'https://laravel-news.com' . $link;
             }
         
-            // Пропускаем ссылки с UTM-параметрами или на рекламные страницы
             if (strpos($link, 'utm_') !== false || strpos($link, '/advertising') !== false) {
                 return null; // Возвращаем null, чтобы пропустить статью
             }
@@ -68,16 +66,14 @@ class ParseArticles extends Command
             ];
         });
         
-        // Убираем пустые статьи
         $articles = array_filter($articles, fn($article) => $article !== null);        
         
-        dd($articles);  // Добавляем вывод содержимого переменной        
+        dd($articles);      
 
-        // Убираем пустые значения (null)
         $articles = array_filter($articles);
 
         foreach ($articles as $article) {
-            $this->info('Parsed article: ' . print_r($article, true));  // Добавьте вывод
+            $this->info('Parsed article: ' . print_r($article, true)); 
             Article::updateOrCreate(
                 ['link' => $article['link']],
                 [

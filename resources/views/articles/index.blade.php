@@ -56,6 +56,25 @@
             background-repeat: no-repeat; /* Отключает повтор */
             color: white; /* Делает текст белым для контраста */
         }
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(255, 255, 255, 0.8); /* Полупрозрачный фон */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1050; /* Спиннер будет поверх всего */
+        }
+
+        .spinner-border.text-primary {
+            color: #0d6efd; /* Цвет Bootstrap Primary */
+            width: 4rem;
+            height: 4rem;
+        }
+
     </style>
 </head>
 <body>
@@ -104,6 +123,12 @@
         @endforeach
     </tbody>
     </table>
+    <div id="loading-spinner" class="spinner-overlay" style="display: none">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
 
     <button id="fetch-updates" type="button" class="btn btn-primary">Update articles</button>
     </section>
@@ -117,25 +142,35 @@
     </footer>
     <!-- Модальное окно -->
     <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="statusModalLabel">Status</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="statusModalLabel">Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="statusModalBody">
+                    <!-- Здесь будет сообщение -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
-        <div class="modal-body" id="statusModalBody">
-            <!-- Здесь будет сообщение -->
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-        </div>
-        </div>
-    </div>
     </div>
     
     <script src="https://kit.fontawesome.com/0e34ff38b4.js" crossorigin="anonymous"></script>
     <script>
-        document.getElementById('fetch-updates').addEventListener('click', function () {
+    document.getElementById('fetch-updates').addEventListener('click', function () {
+        const spinner = document.getElementById('loading-spinner');
+        const modalBody = document.getElementById('statusModalBody');
+        const modal = new bootstrap.Modal(document.getElementById('statusModal'));
+
+        // Показываем спиннер
+        spinner.style.display = 'flex'; // Показываем спиннер
+
+        // Скрываем модальное окно перед отправкой запроса
+        modal.hide();
+
         fetch('/fetch-updates', {
             method: 'POST',
             headers: {
@@ -143,30 +178,33 @@
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             }
         })
-            .then(response => response.json())
-            .then(data => {
-                const modalBody = document.getElementById('statusModalBody');
-                const modal = new bootstrap.Modal(document.getElementById('statusModal'));
+        .then(response => response.json())
+        .then(data => {
+            // Скрываем спиннер
+            spinner.style.display = 'none';
 
-                if (data.success) {
-                    modalBody.textContent = 'Updates fetched successfully!';
-                    modal.show();
-
-                    // Обновляем данные на странице
-                    fetchArticles(); // Вызовите функцию, чтобы обновить таблицу
-                } else {
-                    modalBody.textContent = data.message || 'An error occurred.';
-                    modal.show();
-                }
-            })
-            .catch(error => {
-                const modalBody = document.getElementById('statusModalBody');
-                const modal = new bootstrap.Modal(document.getElementById('statusModal'));
-
-                modalBody.textContent = 'Error fetching updates!';
-                console.error(error);
+            if (data.success) {
+                modalBody.textContent = 'Updates fetched successfully!';
                 modal.show();
-            });
+
+                // Обновляем данные на странице
+                fetchArticles(); // Вызовите функцию, чтобы обновить таблицу
+            } else {
+                modalBody.textContent = data.message || 'An error occurred.';
+                modal.show();
+            }
+        })
+        .catch(error => {
+            // Скрываем спиннер
+            spinner.style.display = 'none';
+
+            const modalBody = document.getElementById('statusModalBody');
+            const modal = new bootstrap.Modal(document.getElementById('statusModal'));
+
+            modalBody.textContent = 'Error fetching updates!';
+            console.error(error);
+            modal.show();
+        });
     });
 
     // Функция для получения обновленных статей и обновления таблицы
