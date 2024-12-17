@@ -6,16 +6,16 @@
     <title>Articles</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-    <!-- Подключение стилей для таблицы -->
+    <!-- Connecting styles for a table -->
     <style>
-         /* Сброс всех отступов */
+         /* Reset all indents*/
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box; /* Рекомендуется для правильного расчета размеров блоков */
+            box-sizing: border-box;
         }
 
-        /* Опционально: установка ширины и высоты для html и body */
+        /* setting width and height for html and body*/
         html, body {
             width: 100%;
             height: 100%;
@@ -23,7 +23,6 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #F5F6F9;
-            /* background-image: url("{{ asset('storage/images/background-image-with-a-light-gray-color.jpg') }}"); */
         }
         table {
             width: 100%;
@@ -51,10 +50,10 @@
 
         .bg-image {
             background-image: url("{{ asset('storage/images/background-hero-image-with-a-light-gray.jpg') }}");
-            background-size: cover; /* Покрывает весь блок */
-            background-position: bottom; /* Центрирует изображение */
-            background-repeat: no-repeat; /* Отключает повтор */
-            color: white; /* Делает текст белым для контраста */
+            background-size: cover; 
+            background-position: bottom;
+            background-repeat: no-repeat;
+            color: white;
         }
         .spinner-overlay {
             position: fixed;
@@ -62,15 +61,15 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(255, 255, 255, 0.8); /* Полупрозрачный фон */
+            background-color: rgba(255, 255, 255, 0.8); 
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1050; /* Спиннер будет поверх всего */
+            z-index: 1050; 
         }
 
         .spinner-border.text-primary {
-            color: #0d6efd; /* Цвет Bootstrap Primary */
+            color: #0d6efd; 
             width: 4rem;
             height: 4rem;
         }
@@ -149,7 +148,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="statusModalBody">
-                    <!-- Здесь будет сообщение -->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
@@ -165,10 +163,10 @@
         const modalBody = document.getElementById('statusModalBody');
         const modal = new bootstrap.Modal(document.getElementById('statusModal'));
 
-        // Показываем спиннер
-        spinner.style.display = 'flex'; // Показываем спиннер
+        //Showing the spinner
+        spinner.style.display = 'flex';
 
-        // Скрываем модальное окно перед отправкой запроса
+        // Hiding the modal window before sending a request
         modal.hide();
 
         fetch('/fetch-updates', {
@@ -180,22 +178,22 @@
         })
         .then(response => response.json())
         .then(data => {
-            // Скрываем спиннер
+            // Hiding the spinner
             spinner.style.display = 'none';
 
             if (data.success) {
                 modalBody.textContent = 'Updates fetched successfully!';
                 modal.show();
 
-                // Обновляем данные на странице
-                fetchArticles(); // Вызовите функцию, чтобы обновить таблицу
+                // Updating the data on the page
+                fetchArticles();
             } else {
                 modalBody.textContent = data.message || 'An error occurred.';
                 modal.show();
             }
         })
         .catch(error => {
-            // Скрываем спиннер
+
             spinner.style.display = 'none';
 
             const modalBody = document.getElementById('statusModalBody');
@@ -207,13 +205,13 @@
         });
     });
 
-    // Функция для получения обновленных статей и обновления таблицы
+    // Function to retrieve updated articles and update the table
     function fetchArticles() {
-        fetch('//articles') // Здесь должен быть путь для получения данных о статьях
+        fetch('//articles')
             .then(response => response.json())
             .then(data => {
                 const tableBody = document.querySelector('table tbody');
-                tableBody.innerHTML = ''; // Очищаем старые строки
+                tableBody.innerHTML = ''; // Clearing out old lines
 
                 data.articles.forEach(article => {
                     const row = document.createElement('tr');

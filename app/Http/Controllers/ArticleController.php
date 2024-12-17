@@ -163,16 +163,16 @@ class ArticleController extends Controller
 
     public function index(Request $request)
     {
-        // Получаем параметры сортировки из запроса, если они есть, или по умолчанию
-        $sortBy = $request->get('sort_by', 'author'); // По умолчанию сортируем по автору
-        $order = $request->get('order', 'asc'); // По умолчанию сортируем по возрастанию (по алфавиту)
+        // Get sorting parameters from the query, if any, or by default
+        $sortBy = $request->get('sort_by', 'author'); // By default, we sort by author
+        $order = $request->get('order', 'asc'); // By default we sort in ascending order (alphabetically)
 
-        // Если сортируем по автору, то обязательно сортировать по возрастанию (алфавит)
+        // If we sort by author, we must sort in ascending order (alphabetical)
         if ($sortBy === 'author') {
             $order = 'asc';
         }
 
-        // Загружаем статьи с тегом "News" и сортируем по выбранным критериям
+        // Upload articles with the tag "News" and sort by selected criteria
         $articles = Article::where('tags', 'like', '%News%')
             ->orderBy($sortBy, $order)
             ->get();
@@ -180,27 +180,27 @@ class ArticleController extends Controller
         return view('articles.index', compact('articles'));
     }
 
-    // Метод для обработки запроса на обновление
+    // Method for processing an update request
     public function fetchUpdates()
     {
-        // Загружаем и сохраняем новые статьи
+        // Uploading and saving new articles
         $this->articleParserService->fetchArticles();
 
-        // Возвращаем успех
+        // Bringing back success
         return response()->json([
             'success' => true,
         ]);
     }
 
-    // Метод для получения списка статей в формате JSON
+    // Method to get the list of articles in JSON format
     public function getArticles()
     {
-        // Получаем статьи с тегом "News" и сортируем по автору
+        // Get articles with the tag "News" and sort by author
         $articles = Article::where('tags', 'like', '%News%')
             ->orderBy('author', 'asc')
             ->get();
 
-        // Возвращаем статьи в формате JSON
+        // Return articles in JSON format
         return response()->json([
             'articles' => $articles
         ]);
