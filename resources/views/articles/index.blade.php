@@ -207,7 +207,7 @@
 
     // Function to retrieve updated articles and update the table
     function fetchArticles() {
-        fetch('//articles')
+        fetch('/articles')
             .then(response => response.json())
             .then(data => {
                 const tableBody = document.querySelector('table tbody');
