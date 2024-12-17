@@ -214,9 +214,11 @@
                 tableBody.innerHTML = ''; // Clearing out old lines
 
                 data.articles.forEach(article => {
+                    const publicationDate = new Date(article.publication_date);
+                    const formattedDate = publicationDate.toLocaleDateString();
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${article.publication_date}</td>
+                        <td>${formattedDate}</td>
                         <td><a href="${article.link}" target="_blank">${article.title}</a></td>
                         <td>${article.author}</td>
                         <td>${article.tags}</td>
